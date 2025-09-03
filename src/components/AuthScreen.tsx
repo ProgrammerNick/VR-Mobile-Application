@@ -26,7 +26,11 @@ export function AuthScreen() {
     setIsLoading(true)
     
     try {
-      await signIn(signInEmail, signInPassword)
+      const success = await signIn(signInEmail, signInPassword)
+      if (success) {
+        // The onAuthStateChange listener in AuthContext should handle the redirect
+        console.log('Sign in successful, waiting for auth state change')
+      }
     } finally {
       setIsLoading(false)
     }
@@ -37,7 +41,11 @@ export function AuthScreen() {
     setIsLoading(true)
     
     try {
-      await signUp(signUpEmail, signUpPassword, signUpName)
+      const success = await signUp(signUpEmail, signUpPassword, signUpName)
+      if (success) {
+        // The onAuthStateChange listener in AuthContext should handle the redirect
+        console.log('Sign up successful, waiting for auth state change')
+      }
     } finally {
       setIsLoading(false)
     }

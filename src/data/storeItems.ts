@@ -48,7 +48,7 @@ export const storeItems = [
       contentId: 'new-2',
       title: 'Prehistoric World',
       description: 'Walk with dinosaurs in their natural habitat.',
-      thumbnail: 'https://images.pexels.com/photos/9660892/pexels-photo-9660892.jpeg',
+      thumbnail: 'https://images.unsplash.com/photo-1616210587204-3e67e30f5615?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkaW5vc2F1ciUyMGZvcmVzdCUyMHByZWhpc3RvcmljfGVufDF8fHx8MTc1NjM2MTI5M3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
       duration: '35 min',
       category: 'Adventure',
       rating: 4.4,

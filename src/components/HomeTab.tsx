@@ -104,8 +104,8 @@ export function HomeTab({ onPreview, onPlay, onPurchase, vrContent, purchases, p
                 {...space}
                 thumbnail={space.thumbnail}
                 onPreview={() => onPreview(space.id)}
-                onPlay={purchases.includes(space.id) || !space.price ? () => onPlay(space.id) : () => onPurchase(space.id, space.price)}
-                purchased={purchases.includes(space.id)}
+                onPlay={purchases.includes(parseInt(space.id, 10)) || !space.price ? () => onPlay(space.id) : () => onPurchase(space.id, space.price)}
+                purchased={purchases.includes(parseInt(space.id, 10))}
               />
             ))}
           </div>

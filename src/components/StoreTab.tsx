@@ -108,9 +108,9 @@ export function StoreTab({ onPreview, onPlay, onPurchase, onBulkPurchase, vrCont
                 key={item.id}
                 {...item}
                 thumbnail={item.thumbnail}
-                purchased={purchases.includes(item.id)}
+                purchased={purchases.includes(parseInt(item.contentId, 10))}
                 onPreview={() => onPreview(item.contentId)}
-                onPlay={purchases.includes(item.id) ? () => onPlay(item.contentId) : () => onPurchase(item.id, item.price)}
+                onPlay={purchases.includes(parseInt(item.contentId, 10)) ? () => onPlay(item.contentId) : () => onPurchase(item.contentId, item.price)}
               />
             ))}
           </TabsContent>
@@ -122,6 +122,7 @@ export function StoreTab({ onPreview, onPlay, onPurchase, onBulkPurchase, vrCont
                 key={item.id}
                 {...item}
                 thumbnail={item.thumbnail}
+                purchased={true} // Free content is always "purchased"
                 onPreview={() => onPreview(item.contentId)}
                 onPlay={() => onPlay(item.contentId)}
               />

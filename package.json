@@ -51,7 +51,11 @@
   },
   "devDependencies": {
     "@types/node": "^20.19.11",
-    "@vitejs/plugin-react-swc": "^3.10.2"
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react-swc": "^3.10.2",
+    "supabase": "^2.39.2",
+    "typescript": "^5.9.2"
   },
   "scripts": {
     "dev": "vite",

@@ -2,16 +2,18 @@ import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AuthScreen } from './components/AuthScreen';
 import { BottomNavigation } from './components/BottomNavigation';
-import { HomeTab } from './components/HomeTab';
 import { StoreTab } from './components/StoreTab';
 import { FriendsTab } from './components/FriendsTab';
-import { ProfileTab } from './components/ProfileTab';
+import CommunityFocusedHome from './components/CommunityFocusedHome';
+import UserProfile from './components/UserProfile';
+import CommunityTab from './components/EnhancedCommunityTab'; // Import enhanced CommunityTab
 import { VRContentPreview } from './components/VRContentPreview';
 import { useVRContentData } from './hooks/useVRContentData';
-import { vrApi } from './utils/supabase/client';
 import { toast } from 'sonner';
 import { Toaster } from './components/ui/sonner';
 import { storeItems } from './data/storeItems';
+import { getContent, getPurchases, purchaseContent } from './services/content';
+import { updateActivity } from './services/activity';
 
 function AppContent() {
   const { user, profile, loading } = useAuth();
@@ -32,7 +34,7 @@ function AppContent() {
 
   const fetchVRContent = async () => {
     try {
-      const data = await vrApi.getContent();
+      const data = await getContent();
       setVrContent(data.content || []);
     } catch (error) {
       console.error('Error fetching VR content:', error);
@@ -48,13 +50,13 @@ function AppContent() {
           thumbnail: 'https://images.unsplash.com/photo-1547930206-82ac0a7aa08d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGRpZ2l0YWwlMjB3b3JsZHxlbnwxfHx8fDE3NTYzNTcyMTR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral'
         }
       ]);
-      toast.error('Using offline content - some features may be limited');
     }
   };
 
   const fetchPurchases = async () => {
+    if (!user) return;
     try {
-      const data = await vrApi.getPurchases();
+      const data = await getPurchases();
       setPurchases(data.purchases || []);
     } catch (error) {
       console.error('Error fetching purchases:', error);
@@ -64,12 +66,13 @@ function AppContent() {
   };
 
   const handlePreview = async (id: string) => {
+    if (!user) return;
     try {
       const details = getContentDetails(id);
       if (details) {
         setPreviewContent(details);
         setIsPreviewOpen(true);
-        await vrApi.updateActivity('Previewing VR experience', id);
+        await updateActivity('Previewing VR experience', id);
       } else {
         toast.error('Content details not available');
       }
@@ -87,17 +90,18 @@ function AppContent() {
   };
 
   const handlePlay = async (id: string) => {
+    if (!user) return;
     try {
       // Check if content is purchased (if it has a price)
       const content = vrContent.find((c: any) => c.id === id);
-      if (content?.price && !purchases.includes(id)) {
+      if (content?.price && !purchases.includes(parseInt(content.id, 10))) {
         toast.error('Purchase required', {
           description: 'You need to purchase this content to play it'
         });
         return;
       }
 
-      await vrApi.updateActivity('Playing VR experience', id);
+      await updateActivity('Playing VR experience', id);
       toast.success('Starting VR experience...', {
         description: 'Make sure your headset is connected'
       });
@@ -110,8 +114,21 @@ function AppContent() {
   };
 
   const handlePurchase = async (id: string, price: number) => {
+    if (!user) return;
     try {
-      await vrApi.purchaseContent(id, price);
+      // Find the content item to get the correct contentId
+      const contentItem = vrContent.find((c: any) => c.id === id);
+      if (!contentItem) {
+        throw new Error('Content not found');
+      }
+      
+      // Convert contentId to number for database operations
+      const contentId = parseInt(contentItem.id, 10);
+      if (isNaN(contentId)) {
+        throw new Error('Invalid content ID');
+      }
+      
+      await purchaseContent(contentId, price);
       await fetchPurchases(); // Refresh purchases
       toast.success('Content purchased successfully!', {
         description: 'You can now access this VR experience'
@@ -125,10 +142,16 @@ function AppContent() {
   };
 
   const handleBulkPurchase = async () => {
+    if (!user) return;
     try {
       for (const item of storeItems) {
-        if (!purchases.includes(item.id)) {
-          await vrApi.purchaseContent(item.id, item.price);
+        const contentId = parseInt(item.contentId, 10);
+        if (isNaN(contentId)) {
+          console.error('Invalid content ID for item:', item);
+          continue;
+        }
+        if (!purchases.includes(contentId)) {
+          await purchaseContent(contentId, item.price);
         }
       }
       await fetchPurchases(); // Refresh purchases
@@ -173,15 +196,17 @@ function AppContent() {
 
     switch (activeTab) {
       case 'home':
-        return <HomeTab {...tabProps} />;
+        return <CommunityFocusedHome onPlay={handlePlay} />;
       case 'store':
         return <StoreTab {...tabProps} />;
       case 'friends':
         return <FriendsTab />;
+      case 'community':
+        return <CommunityTab />;
       case 'profile':
-        return <ProfileTab profile={profile} />;
+        return <UserProfile />; // Use new UserProfile component
       default:
-        return <HomeTab {...tabProps} />;
+        return <CommunityFocusedHome onPlay={handlePlay} />;
     }
   };
 
@@ -203,7 +228,7 @@ function AppContent() {
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
         content={previewContent}
-        purchased={previewContent ? purchases.includes(previewContent.id) : false}
+        purchased={previewContent ? purchases.includes(parseInt(previewContent.id, 10)) : false}
         onPlay={handlePlay}
         onPurchase={handlePurchase}
       />

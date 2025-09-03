@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { supabase, vrApi } from '../utils/supabase/client'
+import { supabase } from '../utils/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { toast } from 'sonner@2.0.3'
+import { toast } from 'sonner'
+import { getProfile, upsertProfile } from '../supabase/db/profile'
 
 interface AuthContextType {
   user: User | null
@@ -22,59 +23,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Check for existing session on app start
   useEffect(() => {
+    console.log('Getting initial session')
     getInitialSession()
   }, [])
 
-  // Listen for auth changes
+  // Check for existing session on app start
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event)
-        
-        if (session?.user) {
-          setUser(session.user)
-          vrApi.setAccessToken(session.access_token)
-          await fetchProfile()
-        } else {
-          setUser(null)
-          setProfile(null)
-          vrApi.setAccessToken(null)
-        }
-        setLoading(false)
-      }
-    )
-
-    return () => subscription.unsubscribe()
+    console.log('Getting initial session')
+    getInitialSession()
   }, [])
 
   const getInitialSession = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession()
+      console.log('Getting session from Supabase')
+      const { data: { session }, error } = await supabase.auth.getSession()
+      console.log('Session data:', session, 'Error:', error)
       
       if (session?.user) {
+        console.log('User found in session:', session.user)
         setUser(session.user)
-        vrApi.setAccessToken(session.access_token)
+        // vrApi.setAccessToken(session.access_token) // Removed vrApi call
         await fetchProfile()
+      } else {
+        console.log('No user in session')
       }
     } catch (error) {
       console.error('Error getting initial session:', error)
       toast.error('Authentication error occurred')
     } finally {
+      console.log('Setting loading to false in getInitialSession')
       setLoading(false)
     }
   }
 
   const fetchProfile = async () => {
+    if (!user) return; // Ensure user exists before fetching profile
+    console.log('Fetching profile for user:', user.id)
     try {
-      const data = await vrApi.getProfile()
-      setProfile(data.profile)
+      const data = await getProfile(user.id) // Use direct Supabase profile function
+      console.log('Profile data:', data)
+      setProfile(data)
     } catch (error: any) {
       console.error('Error fetching profile:', error)
       
       // If profile doesn't exist, create a default one
-      if (error.message?.includes('Profile not found') && user) {
+      // Check for specific error code if possible, otherwise rely on message
+      if ((error.message?.includes('Profile not found') || error.message?.includes('PGRST')) && user) {
         try {
           const defaultProfile = {
+            id: user.id, // Add user ID for upsert
             name: user.user_metadata?.name || user.email?.split('@')[0] || 'VR User',
             level: 1,
             experiencesPlayed: 0,
@@ -82,8 +79,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             achievements: []
           }
           
-          const updatedData = await vrApi.updateProfile(defaultProfile)
-          setProfile(updatedData.profile)
+          console.log('Creating default profile:', defaultProfile)
+          const updatedData = await upsertProfile(defaultProfile) // Use direct Supabase profile function
+          console.log('Default profile created:', updatedData)
+          setProfile(updatedData)
         } catch (createError) {
           console.error('Error creating default profile:', createError)
         }
@@ -93,6 +92,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string): Promise<boolean> => {
     try {
+      setLoading(true)
+      console.log('Attempting to sign in with:', email)
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -101,39 +102,73 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) {
         console.error('Sign in error:', error)
         toast.error(`Sign in failed: ${error.message}`)
+        setLoading(false)
         return false
       }
 
+      console.log('Sign in successful:', data)
       toast.success('Successfully signed in!')
+      setLoading(false)
       return true
     } catch (error) {
       console.error('Sign in error during authentication:', error)
       toast.error('Failed to sign in')
+      setLoading(false)
       return false
     }
   }
 
   const signUp = async (email: string, password: string, name: string): Promise<boolean> => {
     try {
-      const data = await vrApi.signup(email, password, name)
+      setLoading(true)
+      console.log('Attempting to sign up with:', email)
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name: name, // Pass name to user metadata
+          },
+        },
+      })
+
+      if (error) {
+        console.error('Sign up error:', error)
+        toast.error(`Sign up failed: ${error.message}`)
+        setLoading(false)
+        return false
+      }
+
+      console.log('Sign up successful:', data)
       toast.success('Account created successfully!')
+      setLoading(false)
       
-      // Now sign them in
-      return await signIn(email, password)
+      // Now sign them in (Supabase signUp often signs in automatically, but this ensures it)
+      if (data.user) {
+        return true; // User is already signed in
+      } else {
+        return await signIn(email, password) // Fallback to sign in if not automatically signed in
+      }
     } catch (error: any) {
       console.error('Sign up error:', error)
       toast.error(error.message || 'Failed to create account')
+      setLoading(false)
       return false
     }
   }
 
   const signOut = async () => {
     try {
+      setLoading(true)
+      console.log('Attempting to sign out')
       await supabase.auth.signOut()
+      console.log('Sign out successful')
       toast.success('Signed out successfully')
+      setLoading(false)
     } catch (error) {
       console.error('Sign out error:', error)
       toast.error('Failed to sign out')
+      setLoading(false)
     }
   }
 
@@ -142,6 +177,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await fetchProfile()
     }
   }
+
+  // Check for existing session on app start
+  useEffect(() => {
+    console.log('Getting initial session')
+    getInitialSession()
+  }, [])
+
+  // Listen for auth changes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session)
+        
+        if (session?.user) {
+          setUser(session.user)
+          // vrApi.setAccessToken(session.access_token) // Removed vrApi call
+          await fetchProfile()
+        } else {
+          setUser(null)
+          setProfile(null)
+          // vrApi.setAccessToken(null) // Removed vrApi call
+        }
+        setLoading(false)
+      }
+    )
+
+    return () => {
+      console.log('Unsubscribing from auth state changes')
+      subscription.unsubscribe()
+    }
+  }, [])
 
   return (
     <AuthContext.Provider

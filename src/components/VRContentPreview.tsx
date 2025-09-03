@@ -97,7 +97,7 @@ export function VRContentPreview({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden p-0">
+      <DialogContent className="max-w-4xl max-h-[90vh] p-0 flex flex-col">
         <div className="flex flex-col h-full">
           {/* Header with Close Button */}
           <DialogHeader className="flex-row items-center justify-between p-4 border-b">

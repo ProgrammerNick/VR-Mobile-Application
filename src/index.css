@@ -5089,3 +5089,8 @@ html {
     opacity: 0;
   }
 }
+
+/* Add margin at the bottom to prevent content from being hidden behind bottom navigation */
+main {
+  margin-bottom: 70px;
+}
