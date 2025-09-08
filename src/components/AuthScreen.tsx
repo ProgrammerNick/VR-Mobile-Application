@@ -52,7 +52,7 @@ export function AuthScreen() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-500/10 via-blue-600/10 to-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
@@ -200,9 +200,9 @@ export function AuthScreen() {
         </Card>
 
         {/* Demo Account Info */}
-        <div className="text-center mt-6 p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
-          <h4 className="text-sm font-medium text-blue-700 dark:text-blue-300 mb-2">Try Demo Account</h4>
-          <p className="text-xs text-blue-600 dark:text-blue-400 mb-2">
+        <div className="text-center mt-6 p-4 bg-primary/10 rounded-lg border border-primary/20">
+          <h4 className="text-sm font-medium text-primary mb-2">Try Demo Account</h4>
+          <p className="text-xs text-primary/80 mb-2">
             Email: demo@vrcompanion.app<br/>
             Password: demo123456
           </p>

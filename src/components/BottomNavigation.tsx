@@ -31,7 +31,7 @@ export function BottomNavigation({ activeTab, onTabChange }: BottomNavigationPro
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <Icon className={`w-5 h-5 mb-1 ${isActive ? 'fill-current' : ''}`} />
+              <Icon className={`w-5 h-5 mb-1 ${isActive ? 'fill-current' : ''}`}/>
               <span className="text-xs">{tab.label}</span>
             </button>
           );

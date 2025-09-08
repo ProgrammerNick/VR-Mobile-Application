@@ -47,7 +47,7 @@ const GroupsTab = () => {
       members: 1242,
       isPrivate: false,
       category: "Music Games",
-      avatar_url: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=150&h=150&fit=crop",
+      avatar_url: "https://image.api.playstation.com/gs2-sec/appkgo/prod/CUSA14143_00/1/i_1867cbfbe18338d0089137e8e84ec6b550a97e1f62a41df7c66e1cba550b1484/i/icon0.png",
       isAdmin: true
     },
     {
@@ -57,7 +57,7 @@ const GroupsTab = () => {
       members: 876,
       isPrivate: false,
       category: "Adventure",
-      avatar_url: "https://images.unsplash.com/photo-1559583927-5ba60432b992?w=150&h=150&fit=crop",
+      avatar_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Sureal_Horizon.jpg/800px-Sureal_Horizon.jpg?20161124210318",
       isAdmin: false
     },
     {
@@ -67,7 +67,7 @@ const GroupsTab = () => {
       members: 543,
       isPrivate: true,
       category: "Development",
-      avatar_url: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=150&h=150&fit=crop",
+      avatar_url: "https://www.uploadvr.com/content/images/size/w1024/format/webp/2017/07/echo-arena-featured-image.jpg",
       isAdmin: false
     },
     {
