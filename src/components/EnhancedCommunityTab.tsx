@@ -35,6 +35,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Badge } from "./ui/badge";
 import { Separator } from "./ui/separator";
+import { mockUsers } from "../data/users";
 import { useAuth } from "../contexts/AuthContext";
 
 // --- TYPE DEFINITIONS ---
@@ -116,9 +117,8 @@ const EnhancedCommunityTab = () => {
     {
       id: "post1",
       author: {
-        name: "GamerX",
-        avatarUrl:
-          "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face",
+        name: mockUsers.GamerX.username,
+        avatarUrl: mockUsers.GamerX.avatar_url,
       },
       timestamp: "2h ago",
       content:
@@ -134,9 +134,8 @@ const EnhancedCommunityTab = () => {
     {
       id: "post2",
       author: {
-        name: "VR_Master",
-        avatarUrl:
-          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+        name: mockUsers.VR_Master.username,
+        avatarUrl: mockUsers.VR_Master.avatar_url,
       },
       timestamp: "5h ago",
       content:
@@ -144,7 +143,7 @@ const EnhancedCommunityTab = () => {
       game: {
         name: "Echo Arena",
         imageUrl:
-          "https://images.unsplash.com/photo-1551712709-a64b0717f09d?w=300&h=200&fit=crop",
+          "https://roadtovrlive-5ea0.kxcdn.com/wp-content/uploads/2017/10/echo-arena-concept.jpg",
       },
       likes: 8,
       comments: 15,
@@ -152,9 +151,8 @@ const EnhancedCommunityTab = () => {
     {
       id: "post3",
       author: {
-        name: "ArtfulDodger",
-        avatarUrl:
-          "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face",
+        name: mockUsers.ArtfulDodger.username,
+        avatarUrl: mockUsers.ArtfulDodger.avatar_url,
       },
       timestamp: "1d ago",
       content:
@@ -166,7 +164,6 @@ const EnhancedCommunityTab = () => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [onlineUsers, setOnlineUsers] = useState<User[]>([]);
   const [userLikes, setUserLikes] = useState<number[]>([]);
-  const [userId, setUserId] = useState<string | undefined>();
 
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [loadingLfg, setLoadingLfg] = useState(true);
@@ -241,9 +238,8 @@ const EnhancedCommunityTab = () => {
           "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=300&h=200&fit=crop",
         likes_count: 24,
         profiles: {
-          username: "RhythmMaster",
-          avatar_url:
-            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+          username: mockUsers.RhythmMaster.username,
+          avatar_url: mockUsers.RhythmMaster.avatar_url,
         },
       },
       {
@@ -256,9 +252,8 @@ const EnhancedCommunityTab = () => {
         screenshot_url: null,
         likes_count: 18,
         profiles: {
-          username: "SynthAddict",
-          avatar_url:
-            "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face",
+          username: mockUsers.SynthAddict.username,
+          avatar_url: mockUsers.SynthAddict.avatar_url,
         },
       },
     ]);
@@ -284,40 +279,9 @@ const EnhancedCommunityTab = () => {
       },
     ]);
 
-    setOnlineUsers([
-      {
-        id: "user1",
-        username: "VRProGamer",
-        avatar_url:
-          "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
-        level: 24,
-        achievements_count: 42,
-        friends_count: 87,
-        isOnline: true,
-      },
-      {
-        id: "user2",
-        username: "QuestExplorer",
-        avatar_url:
-          "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face",
-        level: 18,
-        achievements_count: 29,
-        friends_count: 56,
-        isOnline: true,
-      },
-      {
-        id: "user3",
-        username: "BeatMaster",
-        avatar_url:
-          "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face",
-        level: 31,
-        achievements_count: 67,
-        friends_count: 124,
-        isOnline: true,
-      },
-    ]);
-
-    setUserId(user?.id);
+    setOnlineUsers(
+      Object.values(mockUsers).filter((user) => user.isOnline) as any
+    );
   }, [user]);
 
   // --- HANDLERS ---
@@ -350,7 +314,7 @@ const EnhancedCommunityTab = () => {
       toast.error("Achievement Title and Game Name are required.");
       return;
     }
-    if (!userId) {
+    if (!user?.id) {
       toast.error("You must be logged in to post an achievement.");
       return;
     }
@@ -376,7 +340,7 @@ const EnhancedCommunityTab = () => {
   };
 
   const handleLike = (postId: number) => {
-    if (!userId) {
+    if (!user?.id) {
       toast.error("You must be logged in to like a post.");
       return;
     }

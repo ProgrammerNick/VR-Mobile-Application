@@ -16,30 +16,46 @@ interface StoreTabProps {
   purchases: string[];
 }
 
-export function StoreTab({ onPreview, onPlay, onPurchase, onBulkPurchase, vrContent, purchases }: StoreTabProps) {
+export function StoreTab({
+  onPreview,
+  onPlay,
+  onPurchase,
+  onBulkPurchase,
+  vrContent,
+  purchases,
+}: StoreTabProps) {
   // Filter out any content that might already be in vrContent to avoid duplicates
 
   const freeContent = [
     {
-      id: 'store-6',
-      contentId: '6',
-      title: 'VR Tutorial Island',
-      description: 'Learn the basics of VR interaction in this beginner-friendly experience.',
-      thumbnail: 'https://images.unsplash.com/photo-1592478411213-6153e4ebc696?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2aXJ0dWFsJTIwcmVhbGl0eSUyMGdhbWluZ3xlbnwxfHx8fDE3NTYzNTcyMTR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-      duration: '15 min',
-      category: 'Tutorial',
-      rating: 4.3
-    }
+      id: "store-6",
+      contentId: "6",
+      title: "VR Tutorial Island",
+      description:
+        "Learn the basics of VR interaction in this beginner-friendly experience.",
+      thumbnail:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfiupR8M46EbN94y3d19fc19QpYj6auT14pQ&s",
+      duration: "15 min",
+      category: "Tutorial",
+      rating: 4.3,
+    },
   ];
 
-  const categories = ['All', 'Adventure', 'Education', 'Entertainment', 'Nature', 'Simulation'];
+  const categories = [
+    "All",
+    "Adventure",
+    "Education",
+    "Entertainment",
+    "Nature",
+    "Simulation",
+  ];
 
   return (
     <div className="flex-1 overflow-y-auto pb-20">
       {/* Header */}
       <div className="p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10">
         <h1 className="mb-4">VR Store</h1>
-        
+
         <div className="flex gap-2 mb-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -58,7 +74,7 @@ export function StoreTab({ onPreview, onPlay, onPurchase, onBulkPurchase, vrCont
           {categories.map((category) => (
             <Badge
               key={category}
-              variant={category === 'All' ? 'default' : 'secondary'}
+              variant={category === "All" ? "default" : "secondary"}
               className="whitespace-nowrap cursor-pointer"
             >
               {category}
@@ -73,13 +89,15 @@ export function StoreTab({ onPreview, onPlay, onPurchase, onBulkPurchase, vrCont
             <TabsTrigger value="premium">Premium</TabsTrigger>
             <TabsTrigger value="free">Free</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="premium" className="space-y-4">
             {/* Featured Deal */}
             <Card className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 border-purple-200">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <Badge className="bg-purple-500 text-white">Featured Deal</Badge>
+                  <Badge className="bg-purple-500 text-white">
+                    Featured Deal
+                  </Badge>
                   <div className="flex items-center gap-1">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                     <span className="text-sm">Editor's Choice</span>
@@ -92,7 +110,9 @@ export function StoreTab({ onPreview, onPlay, onPurchase, onBulkPurchase, vrCont
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="text-2xl text-primary">$39.99</span>
-                    <span className="text-sm text-muted-foreground line-through ml-2">$66.95</span>
+                    <span className="text-sm text-muted-foreground line-through ml-2">
+                      $66.95
+                    </span>
                   </div>
                   <Button onClick={onBulkPurchase}>
                     <Download className="w-4 h-4 mr-2" />
@@ -110,11 +130,15 @@ export function StoreTab({ onPreview, onPlay, onPurchase, onBulkPurchase, vrCont
                 thumbnail={item.thumbnail}
                 purchased={purchases.includes(parseInt(item.contentId, 10))}
                 onPreview={() => onPreview(item.contentId)}
-                onPlay={purchases.includes(parseInt(item.contentId, 10)) ? () => onPlay(item.contentId) : () => onPurchase(item.contentId, item.price)}
+                onPlay={
+                  purchases.includes(parseInt(item.contentId, 10))
+                    ? () => onPlay(item.contentId)
+                    : () => onPurchase(item.contentId, item.price)
+                }
               />
             ))}
           </TabsContent>
-          
+
           <TabsContent value="free" className="space-y-4">
             {/* Show free content */}
             {freeContent.map((item) => (

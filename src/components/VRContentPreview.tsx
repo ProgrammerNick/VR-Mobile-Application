@@ -1,13 +1,25 @@
-import { useState } from 'react';
-import { X, Play, Star, Clock, Download, Users, Shield, Heart, Share2, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader } from './ui/dialog';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Separator } from './ui/separator';
-import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Avatar, AvatarFallback } from './ui/avatar';
-import { Card, CardContent } from './ui/card';
-import { Progress } from './ui/progress';
+import { useEffect, useState } from "react";
+import {
+  X,
+  Play,
+  Star,
+  Clock,
+  Download,
+  Users,
+  Shield,
+  Heart,
+  Share2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { Dialog, DialogContent, DialogHeader } from "./ui/dialog";
+import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
+import { Separator } from "./ui/separator";
+import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Card, CardContent } from "./ui/card";
+import { Progress } from "./ui/progress";
 
 interface Review {
   id: string;
@@ -48,16 +60,18 @@ interface VRContentPreviewProps {
   onPurchase: (id: string, price: number) => void;
 }
 
-export function VRContentPreview({ 
-  isOpen, 
-  onClose, 
-  content, 
-  purchased, 
-  onPlay, 
-  onPurchase 
+export function VRContentPreview({
+  isOpen,
+  onClose,
+  content,
+  purchased,
+  onPlay,
+  onPurchase,
 }: VRContentPreviewProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState<'overview' | 'reviews'>('overview');
+  const [activeTab, setActiveTab] = useState<"overview" | "reviews">(
+    "overview"
+  );
 
   if (!content) return null;
 
@@ -68,36 +82,54 @@ export function VRContentPreview({
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+    setCurrentImageIndex(
+      (prev) => (prev - 1 + allImages.length) % allImages.length
+    );
   };
 
   const getRatingDistribution = () => {
     if (!content) return [0, 0, 0, 0, 0];
     const { rating, totalRatings } = content;
     const distribution = [0, 0, 0, 0, 0];
-    
+
     // A simple algorithm to create a plausible rating distribution
     const fiveStarRatings = Math.round(totalRatings * (rating / 5));
     distribution[4] = fiveStarRatings;
-    
+
     const fourStarRatings = Math.round((totalRatings - fiveStarRatings) * 0.5);
     distribution[3] = fourStarRatings;
-    
-    const threeStarRatings = Math.round((totalRatings - fiveStarRatings - fourStarRatings) * 0.3);
+
+    const threeStarRatings = Math.round(
+      (totalRatings - fiveStarRatings - fourStarRatings) * 0.3
+    );
     distribution[2] = threeStarRatings;
-    
-    const twoStarRatings = Math.round((totalRatings - fiveStarRatings - fourStarRatings - threeStarRatings) * 0.2);
+
+    const twoStarRatings = Math.round(
+      (totalRatings - fiveStarRatings - fourStarRatings - threeStarRatings) *
+        0.2
+    );
     distribution[1] = twoStarRatings;
-    
-    const oneStarRatings = totalRatings - fiveStarRatings - fourStarRatings - threeStarRatings - twoStarRatings;
+
+    const oneStarRatings =
+      totalRatings -
+      fiveStarRatings -
+      fourStarRatings -
+      threeStarRatings -
+      twoStarRatings;
     distribution[0] = oneStarRatings;
 
     return distribution.reverse();
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0 flex flex-col">
+    <Dialog
+      open={isOpen}
+      onOpenChange={() => {
+        setCurrentImageIndex(0);
+        onClose();
+      }}
+    >
+      <DialogContent className="max-w-4xl max-h-[90vh] p-0 flex flex-col overflow-auto">
         <div className="flex flex-col h-full">
           {/* Header with Close Button */}
           <DialogHeader className="flex-row items-center justify-between p-4 border-b">
@@ -112,7 +144,7 @@ export function VRContentPreview({
                 alt={content.title}
                 className="w-full h-full object-cover"
               />
-              
+
               {/* Navigation Arrows */}
               {allImages.length > 1 && (
                 <>
@@ -141,7 +173,7 @@ export function VRContentPreview({
                   <button
                     key={index}
                     className={`w-2 h-2 rounded-full transition-colors ${
-                      index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                      index === currentImageIndex ? "bg-white" : "bg-white/50"
                     }`}
                     onClick={() => setCurrentImageIndex(index)}
                   />
@@ -157,7 +189,7 @@ export function VRContentPreview({
                     <Badge variant="secondary">{content.category}</Badge>
                     <Badge variant="outline">{content.ageRating}</Badge>
                   </div>
-                  
+
                   <div className="flex items-center gap-4 mb-2">
                     <div className="flex items-center gap-1">
                       <div className="flex">
@@ -165,9 +197,9 @@ export function VRContentPreview({
                           <Star
                             key={i}
                             className={`w-4 h-4 ${
-                              i < Math.floor(content.rating) 
-                                ? 'fill-yellow-400 text-yellow-400' 
-                                : 'text-gray-300'
+                              i < Math.floor(content.rating)
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-gray-300"
                             }`}
                           />
                         ))}
@@ -225,11 +257,7 @@ export function VRContentPreview({
                       <Play className="w-4 h-4 mr-2" />
                       Play Now
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="flex-1"
-                    >
+                    <Button variant="outline" size="lg" className="flex-1">
                       <Download className="w-4 h-4 mr-2" />
                       Download
                     </Button>
@@ -271,28 +299,28 @@ export function VRContentPreview({
               <div className="flex gap-4 mb-6">
                 <button
                   className={`pb-2 border-b-2 transition-colors ${
-                    activeTab === 'overview' 
-                      ? 'border-primary text-primary' 
-                      : 'border-transparent text-muted-foreground'
+                    activeTab === "overview"
+                      ? "border-primary text-primary"
+                      : "border-transparent text-muted-foreground"
                   }`}
-                  onClick={() => setActiveTab('overview')}
+                  onClick={() => setActiveTab("overview")}
                 >
                   Overview
                 </button>
                 <button
                   className={`pb-2 border-b-2 transition-colors ${
-                    activeTab === 'reviews' 
-                      ? 'border-primary text-primary' 
-                      : 'border-transparent text-muted-foreground'
+                    activeTab === "reviews"
+                      ? "border-primary text-primary"
+                      : "border-transparent text-muted-foreground"
                   }`}
-                  onClick={() => setActiveTab('reviews')}
+                  onClick={() => setActiveTab("reviews")}
                 >
                   Reviews ({content.totalRatings})
                 </button>
               </div>
 
               {/* Tab Content */}
-              {activeTab === 'overview' ? (
+              {activeTab === "overview" ? (
                 <div className="space-y-6">
                   {/* Description */}
                   <div>
@@ -320,7 +348,10 @@ export function VRContentPreview({
                     <h3 className="mb-3">System Requirements</h3>
                     <div className="space-y-1">
                       {content.requirements.map((req, index) => (
-                        <p key={index} className="text-sm text-muted-foreground">
+                        <p
+                          key={index}
+                          className="text-sm text-muted-foreground"
+                        >
                           {req}
                         </p>
                       ))}
@@ -340,9 +371,9 @@ export function VRContentPreview({
                               <Star
                                 key={i}
                                 className={`w-4 h-4 ${
-                                  i < Math.floor(content.rating) 
-                                    ? 'fill-yellow-400 text-yellow-400' 
-                                    : 'text-gray-300'
+                                  i < Math.floor(content.rating)
+                                    ? "fill-yellow-400 text-yellow-400"
+                                    : "text-gray-300"
                                 }`}
                               />
                             ))}
@@ -351,14 +382,17 @@ export function VRContentPreview({
                             {content.totalRatings} ratings
                           </p>
                         </div>
-                        
+
                         <div className="flex-1">
                           {getRatingDistribution().map((count, index) => (
-                            <div key={index} className="flex items-center gap-2 mb-1">
+                            <div
+                              key={index}
+                              className="flex items-center gap-2 mb-1"
+                            >
                               <span className="text-sm w-2">{5 - index}</span>
                               <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                              <Progress 
-                                value={(count / content.totalRatings) * 100} 
+                              <Progress
+                                value={(count / content.totalRatings) * 100}
                                 className="flex-1 h-2"
                               />
                               <span className="text-sm text-muted-foreground w-8">
@@ -382,18 +416,20 @@ export function VRContentPreview({
                                 {review.username.slice(0, 2).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
-                            
+
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="text-sm">{review.username}</span>
+                                <span className="text-sm">
+                                  {review.username}
+                                </span>
                                 <div className="flex">
                                   {[...Array(5)].map((_, i) => (
                                     <Star
                                       key={i}
                                       className={`w-3 h-3 ${
-                                        i < review.rating 
-                                          ? 'fill-yellow-400 text-yellow-400' 
-                                          : 'text-gray-300'
+                                        i < review.rating
+                                          ? "fill-yellow-400 text-yellow-400"
+                                          : "text-gray-300"
                                       }`}
                                     />
                                   ))}

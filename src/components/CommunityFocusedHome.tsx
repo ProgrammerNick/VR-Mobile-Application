@@ -14,6 +14,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
+import { mockUsers } from "../data/users";
 import { toast } from "sonner";
 
 interface User {
@@ -53,31 +54,9 @@ interface Achievement {
 
 const CommunityFocusedHome = ({ onPlay }: { onPlay: (id: string) => void }) => {
   // Mock data - in a real app this would come from the backend
-  const [joinedEvents, setJoinedEvents] = useState<number[]>([]);
-
-  const onlineFriends: User[] = [
-    {
-      id: "1",
-      username: "VRProGamer",
-      avatar_url:
-        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face",
-      isOnline: true,
-    },
-    {
-      id: "2",
-      username: "QuestExplorer",
-      avatar_url:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
-      isOnline: true,
-    },
-    {
-      id: "3",
-      username: "BeatMaster",
-      avatar_url:
-        "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=150&h=150&fit=crop&crop=face",
-      isOnline: true,
-    },
-  ];
+  const onlineFriends = Object.values(mockUsers).filter(
+    (user) => user.isOnline
+  );
 
   const trendingGames: Game[] = [
     {
@@ -129,38 +108,19 @@ const CommunityFocusedHome = ({ onPlay }: { onPlay: (id: string) => void }) => {
   const recentAchievements: Achievement[] = [
     {
       id: 1,
-      user: {
-        username: "RhythmMaster",
-        avatar_url:
-          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-      },
+      user: mockUsers.RhythmMaster,
       title: "Perfect Run",
       game: "Pistol Whip",
       timestamp: "2 hours ago",
     },
     {
       id: 2,
-      user: {
-        username: "SynthAddict",
-        avatar_url:
-          "https://images.unsplash.com/photo-1544725176-7c40e5a71c3e?w=150&h=150&fit=crop&crop=face",
-      },
+      user: mockUsers.SynthAddict,
       title: "Marathon Player",
       game: "Synth Riders",
       timestamp: "5 hours ago",
     },
   ];
-
-  const handleJoinEvent = (eventId: number) => {
-    if (joinedEvents.includes(eventId)) {
-      toast.info("You've already joined this event!");
-      return;
-    }
-
-    setJoinedEvents([...joinedEvents, eventId]);
-    toast.success("You've joined this event!");
-    // In a real app, this would update the backend
-  };
 
   return (
     <div className="p-4 space-y-6 h-full overflow-y-auto pb-24">
@@ -232,51 +192,6 @@ const CommunityFocusedHome = ({ onPlay }: { onPlay: (id: string) => void }) => {
                 }
               >
                 Join
-              </Button>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Community Events */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="w-5 h-5" />
-            Upcoming Events
-          </CardTitle>
-          <Button variant="ghost" size="sm">
-            View All
-          </Button>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {communityEvents.map((event) => (
-            <div
-              key={event.id}
-              className="p-3 border rounded-lg bg-gradient-to-r from-primary/5 to-secondary/5"
-            >
-              <div className="flex justify-between">
-                <h3 className="font-medium">{event.title}</h3>
-                <Badge variant="secondary">{event.game_name}</Badge>
-              </div>
-              <div className="flex items-center justify-between mt-2">
-                <span className="text-sm text-muted-foreground">
-                  {event.start_time}
-                </span>
-                <div className="flex items-center gap-1">
-                  <Users className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm">{event.participants}</span>
-                </div>
-              </div>
-              <Button
-                className="w-full mt-3"
-                size="sm"
-                onClick={() => handleJoinEvent(event.id)}
-                variant={
-                  joinedEvents.includes(event.id) ? "secondary" : "default"
-                }
-              >
-                {joinedEvents.includes(event.id) ? "Joined" : "Join Event"}
               </Button>
             </div>
           ))}
